@@ -32,6 +32,7 @@ Thumbs.db
 # Google credentials
 *.json
 !.env.example
+!vercel.json
 
 # Company enrichment local cache (SQLite DB — local state, do not commit)
 data/

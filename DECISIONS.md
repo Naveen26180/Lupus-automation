@@ -1,5 +1,21 @@
 # Architecture Decisions
 
+## 14. Serverless Telegram Webhook (Vercel) (2026-08-15)
+
+**Decision:** Added an event-driven intake path alongside polling: `api/webhook.py` (FastAPI + Mangum for Vercel), `vercel.json`, `deploy/set_webhook.py`, and `DEPLOYMENT-VERCEL.md`. Telegram POSTs each update to the webhook; the function runs the **same** `core/pipeline.Pipeline` and replies via the Bot API with plain `requests`.
+
+**Why:** The user has no credit card (Oracle/GCP/AWS all require one). Vercel Hobby is the only serious free host with no card gate, and its functions (300s max) comfortably fit the 10–25s pipeline. The webhook sleeps between uploads, so cost is $0 forever.
+
+**Key design choices:**
+1. **No python-telegram-bot in the webhook path** — PTB's Application lifecycle (initialize/start/shutdown + event loop) is hostile to stateless serverless functions. The webhook speaks the Bot API directly and reuses `ResumeHandlers`' exact reply texts + `PipelineResult.message`. The polling path (`integrations/telegram/`) is untouched.
+2. **Ephemeral disk handling** — `GOOGLE_DRIVE_CREDENTIALS_JSON` env var is materialized to a temp file at startup (`_ensure_credentials_file`); `GOOGLE_DRIVE_CREDENTIALS` must stay empty on Vercel.
+3. **Retry safety** — Telegram retries webhooks whose processing outlives its timeout; an in-memory `update_id` dedup (10-min TTL) prevents double-processing. Endpoint always returns 200 so Telegram never retry-storms.
+4. **Enrichment must stay `false`** on this path — the scraper can exceed the function window.
+
+**Accepted trade-offs:** no local LLM on serverless (a hard no), audit JSON/MD reports and caches are ephemeral per invocation, Hobby is personal/non-commercial.
+
+**Unchanged:** pipeline order, classifier, validator, enrichment, duplicate detection, sheet schema, polling bot. New tests: `tests/test_webhook.py` (17) all mocked.
+
 ## 13. Pre-Deployment Security Hardening (2026-08-15)
 
 **Decision:** Before first deployment, closed three security gaps and documented the rest in `SECURITY.md`.

@@ -12,6 +12,10 @@ python-docx==1.1.2
 groq==0.15.0
 google-generativeai==0.8.5
 
+# Serverless webhook (Vercel deployment)
+fastapi==0.115.6
+mangum==0.19.0
+
 # Google Drive & Sheets
 google-api-python-client==2.165.0
 google-auth==2.38.0

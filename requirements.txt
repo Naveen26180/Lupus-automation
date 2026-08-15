@@ -1,0 +1,30 @@
+# Telegram
+python-telegram-bot==21.5
+
+# Config
+python-dotenv==1.1.0
+
+# Parsers
+pdfplumber==0.11.4
+python-docx==1.1.2
+
+# AI providers
+groq==0.15.0
+google-generativeai==0.8.5
+
+# Google Drive & Sheets
+google-api-python-client==2.165.0
+google-auth==2.38.0
+google-auth-oauthlib==1.2.1
+gspread==6.1.4
+
+# Validation
+phonenumbers==8.13.53
+
+# Date parsing (post-processing)
+python-dateutil==2.9.0
+
+# Company enrichment — web scraping
+requests==2.32.3
+beautifulsoup4==4.12.3
+lxml==5.3.0

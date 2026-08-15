@@ -1,0 +1,43 @@
+# Environment
+.env
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Logs (application logs can contain candidate PII — never commit)
+logs/
+*.log
+
+# Test caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Google credentials
+*.json
+!.env.example
+
+# Company enrichment local cache (SQLite DB — local state, do not commit)
+data/
+
+# Runtime forensic audit reports (JSON + MD — contain candidate PII)
+audit/
+
+# Runtime debug dump of raw Pass 1 evidence (candidate PII)
+raw_ai_response.json

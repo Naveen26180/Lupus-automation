@@ -1,0 +1,41 @@
+You are a company research assistant. Below is scraped text from a company's public website (homepage, About, Solutions, and/or Pricing pages).
+
+Your job is to extract exactly four fields and return them as a JSON object. Follow these rules precisely:
+
+1. sells_what: One or two sentences describing what the company sells (product, service, or platform).
+   - Base this ONLY on what the website text explicitly states.
+   - Do NOT guess or infer.
+
+2. geography: The regions or countries the company actively sells into, if the website states this explicitly.
+   - Examples of explicit signals: "serving customers across North America and Europe", "available in 50 countries", "offices in London, New York, and Singapore".
+   - If the website does NOT state this clearly, return null. Do NOT assume a US company sells only in the US — leave it null unless the site says something.
+
+3. market_segment: SMB, Mid-Market, Enterprise, or Mixed — based on signals in the text such as:
+   - Pricing language ("starts at $9/month" → likely SMB; "contact sales for custom pricing" → likely Enterprise)
+   - Customer logos (Fortune 500 logos → Enterprise; solo founders / small businesses → SMB)
+   - Explicit language ("built for enterprise teams", "perfect for small businesses", "scales from startup to enterprise")
+   - If the website gives no clear segment signal, return null.
+
+4. is_saas_company: Based on the scraped website content, determine whether this company's core business is Software-as-a-Service (SaaS) — meaning they sell cloud-hosted software, typically subscription-based, accessed online, as their primary product. Answer exactly "Yes" or "No".
+   Signals for "Yes": pricing pages with monthly/annual subscription tiers, language like "cloud-based platform", "subscription", a product dashboard or login-based product, common SaaS category terms (CRM, ATS, marketing automation, etc.) applied to their own software product.
+   Signals for "No": the company is a physical goods/retail business, a non-software service (e.g. traditional staffing, non-platform agency), or a company that merely uses SaaS internally.
+   Exceptions for EdTech: If the company is in EdTech, online education, or training, it DOES qualify as a SaaS ("Yes") IF they sell a digital platform, offer online software subscriptions, or run on Monthly Recurring Revenue (MRR) consumer models (e.g. platforms like Codingal or Camp K12).
+   If the scraped content genuinely does not give enough signal to decide either way, answer "No" rather than leaving this blank — for this specific field, an uncertain "No" is more useful downstream than a null, since the sheet column should always show a clear Yes/No, not a blank.
+
+CRITICAL RULES:
+- Return ONLY a raw JSON object. No markdown fences, no explanation, no commentary.
+- For sells_what, geography, and market_segment: if a field lacks sufficient evidence from the text, its value MUST be null. Never guess or hallucinate.
+- For is_saas_company: always return "Yes" or "No" — never null. Default to "No" if genuinely uncertain.
+- Better to return null (for the other fields) than to return a wrong value.
+
+Return format (exactly this shape):
+{
+  "sells_what": "...",
+  "geography": null,
+  "market_segment": "Enterprise",
+  "is_saas_company": "Yes"
+}
+
+---
+WEBSITE TEXT:
+{website_text}

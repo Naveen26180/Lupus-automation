@@ -18,14 +18,16 @@ your bot there. Your laptop can go to sleep, restart, or die — the server keep
 running.
 
 ### Why Oracle Cloud?
-Oracle Cloud has a genuinely free "Always Free" tier: a 4-core ARM server with
-24 GB of RAM and 200 GB of disk, **free for as long as you keep the account**.
+Oracle Cloud has a genuinely free "Always Free" tier: a 2-core ARM server with
+12 GB of RAM and 200 GB of disk, **free for as long as you keep the account**.
+(Note: in July 2026 Oracle halved the free allowance from 4 OCPU / 24 GB to
+2 OCPU / 12 GB — the numbers in this guide already reflect the new limit.)
 It is the only major cloud that gives a real always-on server for $0. It's the
 same kind of machine you'd get from a paid provider, just free.
 
-It also matters for your long-term plan: 24 GB of RAM is enough to run a small
-local LLM (via Ollama) later, so the same server can host both the bot and your
-future local model.
+It also matters for your long-term plan: 12 GB of RAM is still enough to run a
+small quantized local LLM (e.g. a 7B model via Ollama, ~5 GB) later, so the
+same server can host both the bot and your future local model.
 
 ### How the pieces fit together
 
@@ -90,8 +92,9 @@ try a different card or a prepaid one.
 6. **Shape:** click **Change shape** → check **"Specialty and legacy"** /
    select **Ampere → VM.Standard.A1.Flex** (the Always Free ARM shape).
    Set **OCPUs: 2** and **RAM: 12 GB**.
-   - If you get *"Out of capacity"* on create: change to 4 OCPU / 24 GB, or try
-     a different availability domain, and retry after a few minutes.
+   - If you get *"Out of capacity"* on create: retry in a **different
+     availability domain**, and keep retrying over the next few days (capacity
+     frees up in waves). 2 OCPU / 12 GB is the current free maximum.
 7. **SSH keys:** this is how you'll log in. Choose **"Generate a key pair for
    me"** → Oracle downloads a private key (`.key`) — **save it somewhere safe**,
    you'll use it to connect. (Or paste your own public key if you already have
@@ -322,8 +325,8 @@ sudo reboot                        # reboot the server (bot comes back on its ow
 
 ## 12. Monthly cost: $0
 
-Always Free includes: the ARM VM (4 OCPU / 24 GB), 200 GB block storage, and
-10 TB of outbound data per month. A Telegram polling bot uses kilobytes of data
+Always Free includes: the ARM VM (2 OCPU / 12 GB — halved from 4 OCPU / 24 GB
+in July 2026), 200 GB block storage, and 10 TB of outbound data per month. A Telegram polling bot uses kilobytes of data
 per day. There is nothing to "turn off" — just remember to keep the account
 active (Oracle warns before it reclaims free resources if an account is
 completely idle for a long time; your always-running bot prevents that).

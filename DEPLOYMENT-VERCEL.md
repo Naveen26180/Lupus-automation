@@ -47,11 +47,12 @@ in the repo. If you've pulled the latest, you're ready.
 3. Find **Lupus-automation** in the list → **Import**.
 4. **Framework Preset:** leave as detected (Python). **Root Directory:**
    leave as `/` (the repo root *is* the project).
-5. Vercel auto-detects `requirements.txt` and installs it, and reads
-   `vercel.json` for the function config (300s max duration).
-   `pyproject.toml` pins the entrypoint to `api/webhook:app` so Vercel
-   ignores `main.py` (the polling entry point) and serves the FastAPI
-   webhook instead.
+5. Vercel auto-installs from `requirements.txt` (no `pyproject.toml` in
+   the repo — its presence makes Vercel's uv installer demand a
+   `[project]` table) and reads `vercel.json` for the function config
+   (300s max duration). `index.py` re-exports the FastAPI webhook app at
+   a *default* entrypoint, so Vercel's detector ignores `main.py` (the
+   polling entry point) and serves the webhook instead.
 6. **Deploy** (skip env vars for now — we add them next, then redeploy).
 
 After the first deploy you get a URL like:

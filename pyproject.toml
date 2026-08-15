@@ -1,7 +1,0 @@
-# Vercel Python entrypoint configuration.
-#
-# The repo contains both a polling bot entry point (main.py) and the
-# serverless webhook (api/webhook.py). Tell Vercel explicitly which one
-# is the web application so it does not try to treat main.py as one.
-[tool.vercel]
-entrypoint = "api.webhook:app"

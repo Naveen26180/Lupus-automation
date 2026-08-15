@@ -297,10 +297,15 @@ def process_update(update: dict) -> None:
 
 
 @app.post("/api/webhook")
-def webhook(request: Request) -> dict:
-    """Receive a Telegram update and process it synchronously."""
+async def webhook(request: Request) -> dict:
+    """Receive a Telegram update and process it synchronously.
+
+    Must be async: Starlette's Request.json() is a coroutine. In a sync
+    endpoint it returns an unawaited coroutine and the update is never
+    read (observed in production: 200 + 10ms + zero outgoing calls).
+    """
     try:
-        update = request.json()
+        update = await request.json()
     except Exception:
         logger.exception("Invalid webhook payload")
         return {"ok": True}

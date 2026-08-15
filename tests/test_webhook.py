@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import api.webhook as wh  # noqa: E402
 from core.pipeline import PipelineResult  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -262,31 +263,46 @@ class TestCredentialsFile:
 
 
 # ---------------------------------------------------------------------------
-# Endpoint behavior
+# Endpoint behavior (real ASGI execution via TestClient — this is what caught
+# the production bug where a sync endpoint never awaited request.json())
 # ---------------------------------------------------------------------------
 class TestEndpoint:
-    def test_endpoint_returns_ok_and_processes(self, fake_pipeline, monkeypatch):
+    def _client(self) -> "TestClient":
+        return TestClient(wh.app)
+
+    def test_endpoint_processes_document(self, fake_pipeline, monkeypatch):
         monkeypatch.setattr(wh, "send_message", lambda *a, **k: _send_ok())
         monkeypatch.setattr(wh, "edit_message", lambda *a, **k: None)
         monkeypatch.setattr(wh, "telegram_api", lambda *a, **k: {"result": {"file_path": "x.pdf"}})
         monkeypatch.setattr(wh, "download_file", lambda token, path, dest: dest.write_bytes(b"%PDF-fake"))
 
-        update = _update(document=_document())
-        body = json.dumps(update)
+        resp = self._client().post("/api/webhook", json=_update(document=_document()))
 
-        class FakeRequest:
-            def json(self):
-                return json.loads(body)
-
-        assert wh.webhook(FakeRequest()) == {"ok": True}
+        assert resp.status_code == 200
+        assert resp.json() == {"ok": True}
         assert len(fake_pipeline.calls) == 1
 
-    def test_endpoint_tolerates_invalid_payload(self):
-        class BadRequest:
-            def json(self):
-                raise ValueError("not json")
+    def test_endpoint_handles_start_command(self, monkeypatch):
+        """Regression: request.json() must be awaited — a sync endpoint
+        silently swallowed every update (200 + no outgoing calls)."""
+        sent = []
+        monkeypatch.setattr(
+            wh, "send_message", lambda token, chat, text, **kw: sent.append(text) or _send_ok()
+        )
 
-        assert wh.webhook(BadRequest()) == {"ok": True}
+        resp = self._client().post("/api/webhook", json=_update(text="/start"))
+
+        assert resp.status_code == 200
+        assert sent and sent[0].startswith("👋 Welcome")
+
+    def test_endpoint_tolerates_invalid_payload(self):
+        resp = self._client().post(
+            "/api/webhook",
+            content=b"this is not json",
+            headers={"Content-Type": "application/json"},
+        )
+        assert resp.status_code == 200
+        assert resp.json() == {"ok": True}
 
     def test_handler_is_mangum_instance(self):
         assert wh.handler.__class__.__name__ == "Mangum"

@@ -271,6 +271,7 @@ def classify_candidate_audited(pass1_data: Dict[str, Any]) -> Tuple[Dict[str, An
 
     final_answer["years_of_experience"] = None
     final_answer["current_company"] = None
+    final_answer["current_title"] = None
     final_answer["past_companies"] = None
 
     saas_tags: Set[str] = set()

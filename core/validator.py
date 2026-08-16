@@ -52,7 +52,7 @@ def validate_extracted_fields(data: dict) -> dict:
     # NOTE: past_companies is intentionally excluded — it must stay as a list
     # so that sheets_client._cell_list() can join it with "; " correctly.
     # Converting it to str() here would produce Python repr e.g. "['Acme', 'Foo']".
-    for field in ("college", "current_company"):
+    for field in ("college", "current_company", "current_title"):
         value = result.get(field)
         if value is not None and not isinstance(value, str):
             result[field] = str(value)

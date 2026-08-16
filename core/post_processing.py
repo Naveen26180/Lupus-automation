@@ -139,20 +139,27 @@ def recompute_derived_fields(parsed_response: dict, today: date) -> dict:
                            candidate_name, role.get('start_date_raw'), role.get('end_date_raw'), str(exc))
 
     # 4. Current Company Determination
+    # current_title is taken from the SAME role as current_company, so the two
+    # columns can never mismatch (e.g. two ongoing roles can't split between
+    # company and title).
     full_time_roles = [r for r in valid_roles if r.get("bucket") == "FULL_TIME"]
     # Only keep ongoing ones that do NOT explicitly end before today
     ongoing_ft_roles = [r for r in full_time_roles if r["_is_ongoing"]] 
 
     if len(ongoing_ft_roles) == 1:
-        current_company = ongoing_ft_roles[0].get("employer")
+        current_role = ongoing_ft_roles[0]
     elif len(ongoing_ft_roles) > 1:
         # Pick the one with the latest parsed start_date
         ongoing_ft_roles.sort(key=lambda r: r["_start_date"] or date.min, reverse=True)
-        current_company = ongoing_ft_roles[0].get("employer")
+        current_role = ongoing_ft_roles[0]
     else:
-        current_company = None
+        current_role = None
+
+    current_company = current_role.get("employer") if current_role else None
+    current_title = current_role.get("role_title") if current_role else None
 
     final_answer["current_company"] = current_company
+    final_answer["current_title"] = current_title
 
     # 5. YOE Deterministic Calculation — always decimal years, no months split.
     # years_of_experience is always a decimal (e.g. 8 months → 0.7).

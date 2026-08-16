@@ -35,6 +35,7 @@ COLUMN_HEADERS = [
     "Phone Number",
     "Years of Experience",
     "Current Company",
+    "Title",
     "Is SaaS Company",
     "Past Companies",
     "College",
@@ -220,6 +221,9 @@ class SheetsClient:
             "Phone Number": extracted_data.get("phone_number") or "",
             "Years of Experience": _cell(extracted_data.get("years_of_experience")),
             "Current Company": extracted_data.get("current_company") or "",
+            # Title = role title at the current company, taken from the same
+            # role as current_company (they can never mismatch).
+            "Title": extracted_data.get("current_title") or "",
             # is_saas_company is 'Yes', 'No', or '' (blank = genuinely uncertain).
             # _cell() correctly writes an empty string without shifting later columns.
             "Is SaaS Company": _cell(extracted_data.get("is_saas_company")),

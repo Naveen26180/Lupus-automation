@@ -29,6 +29,71 @@ def test_role_present_is_ongoing():
     result = recompute_derived_fields(payload, today)
     assert result["current_company"] == "Present Corp" # Case 2
 
+def test_current_title_populated_from_ongoing_role():
+    """Ongoing FULL_TIME role → current_title equals its role_title."""
+    today = date(2026, 7, 15)
+    payload = build_payload([{
+        "role_title": "Enrolment Associate",
+        "employer": "Coursera",
+        "bucket": "FULL_TIME",
+        "start_date_raw": "Apr 2023",
+        "end_date_raw": "Present"
+    }])
+    result = recompute_derived_fields(payload, today)
+    assert result["current_company"] == "Coursera"
+    assert result["current_title"] == "Enrolment Associate"
+
+def test_current_title_blank_without_role_title():
+    """Role missing role_title → current_title is None (never crashes)."""
+    today = date(2026, 7, 15)
+    payload = build_payload([{
+        "employer": "Present Corp",
+        "bucket": "FULL_TIME",
+        "start_date_raw": "Jan 2026",
+        "end_date_raw": "Present"
+    }])
+    result = recompute_derived_fields(payload, today)
+    assert result["current_company"] == "Present Corp"
+    assert result["current_title"] is None
+
+def test_current_title_matches_latest_ongoing_role():
+    """Two ongoing FULL_TIME roles → title comes from the one with the
+    latest start date, i.e. the same role as current_company."""
+    today = date(2026, 7, 15)
+    payload = build_payload([
+        {
+            "role_title": "Senior Manager",
+            "employer": "New Corp",
+            "bucket": "FULL_TIME",
+            "start_date_raw": "Jan 2026",
+            "end_date_raw": "Present"
+        },
+        {
+            "role_title": "Associate",
+            "employer": "Old Corp",
+            "bucket": "FULL_TIME",
+            "start_date_raw": "Jan 2025",
+            "end_date_raw": "Present"
+        },
+    ])
+    result = recompute_derived_fields(payload, today)
+    assert result["current_company"] == "New Corp"
+    assert result["current_title"] == "Senior Manager"
+
+def test_current_title_blank_without_current_company():
+    """Internship-only resume → neither current_company nor current_title."""
+    today = date(2026, 7, 15)
+    payload = build_payload([{
+        "role_title": "Summer Intern",
+        "employer": "Intern Corp",
+        "bucket": "INTERNSHIP",
+        "start_date_raw": "Jan 2025",
+        "end_date_raw": "March 2025"
+    }])
+    result = recompute_derived_fields(payload, today)
+    assert result["current_company"] is None
+    assert result["current_title"] is None
+
 def test_overlapping_full_time_roles():
     today = date(2026, 7, 15)
     payload = build_payload([

@@ -94,3 +94,9 @@ The pipeline accepts `(file_path, recruiter_metadata, source)` — it never know
 ## License
 
 Private project — not licensed for redistribution.
+
+<img width="1267" height="881" alt="telegram-chat" src="https://github.com/user-attachments/assets/9960e068-ccd6-4d15-b113-f49d5a3ab9af" />
+
+<img width="1898" height="322" alt="google-sheet" src="https://github.com/user-attachments/assets/73814fc9-4df8-4579-a498-658fe3507919" />
+
+

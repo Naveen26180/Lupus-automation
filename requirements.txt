@@ -9,7 +9,7 @@ pdfplumber==0.11.4
 python-docx==1.1.2
 
 # AI providers
-groq==0.15.0
+groq==0.28.0
 google-generativeai==0.8.5
 
 # Serverless webhook (Vercel deployment)

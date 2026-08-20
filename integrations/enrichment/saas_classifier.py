@@ -79,7 +79,7 @@ def _call_groq(prompt: str) -> str:
     if not api_key:
         raise ValueError("GROQ_API_KEY not set")
 
-    model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+    model = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
     client = Groq(api_key=api_key)
     response = client.chat.completions.create(
         model=model,

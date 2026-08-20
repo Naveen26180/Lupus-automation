@@ -104,7 +104,7 @@ def _call_ai(prompt: str) -> str:
             raise ValueError("GROQ_API_KEY not set")
         # Use the same model as the main GroqClient — read from env so it
         # never drifts out of sync when the model is updated in .env.
-        model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+        model = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
         client = Groq(api_key=api_key)
         response = client.chat.completions.create(
             model=model,

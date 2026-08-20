@@ -13,8 +13,9 @@ from integrations.ai.base_client import BaseAIClient
 
 logger = logging.getLogger(__name__)
 
-# Default model — Llama 3.1 8B Instant (works on all free tiers)
-_DEFAULT_MODEL = "llama-3.1-8b-instant"
+# Default model — GPT-OSS 20B (Groq's recommended replacement for the
+# retired llama-3.1-8b-instant; works on the free tier)
+_DEFAULT_MODEL = "openai/gpt-oss-20b"
 
 # Groq status codes / message fragments that indicate a permanent token-budget error.
 # These must NOT be retried — the same prompt will fail again.

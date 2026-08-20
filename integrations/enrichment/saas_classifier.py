@@ -86,6 +86,9 @@ def _call_groq(prompt: str) -> str:
         messages=[{"role": "user", "content": prompt}],
         temperature=0.0,   # deterministic
         max_tokens=10,     # we only need one word
+        # Suppress reasoning tokens — without this, gpt-oss-20b injects
+        # <think>…</think> into the content which breaks the one-word parse.
+        reasoning_format="hidden",
     )
     return (response.choices[0].message.content or "").strip()
 

@@ -73,6 +73,7 @@ class GroqClient(BaseAIClient):
                 ],
                 temperature=0.0,  # deterministic extraction
                 max_tokens=2048,
+                reasoning_format="hidden",
                 response_format={"type": "json_object"},
             )
 

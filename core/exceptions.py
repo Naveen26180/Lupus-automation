@@ -69,10 +69,10 @@ class ParsingError(ResumeBotError):
 
 
 class AIProviderError(ResumeBotError):
-    """AI provider (Groq / Cerebras / Gemini) call failed or returned unusable output.
+    """Gemini AI call failed or returned unusable output.
 
     Args:
-        provider: Which AI provider was in use ("groq", "cerebras", or "gemini").
+        provider: Which AI provider was in use ("gemini").
         reason: What went wrong (timeout, malformed JSON, etc.).
     """
 

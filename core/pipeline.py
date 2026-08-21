@@ -26,8 +26,6 @@ from core.exceptions import (
 )
 from core.validator import validate_extracted_fields
 from integrations.ai.base_client import BaseAIClient
-from integrations.ai.groq_client import GroqClient
-from integrations.ai.gemini_client import GeminiClient
 from integrations.drive.drive_client import DriveClient
 from integrations.parsers.pdf_parser import extract_text_from_pdf
 from integrations.parsers.docx_parser import extract_text_from_docx
@@ -85,7 +83,7 @@ class Pipeline:
         settings: Application settings.
         drive_client: Initialized DriveClient.
         sheets_client: Initialized SheetsClient.
-        ai_client: Initialized AI client (Groq, Cerebras, or Gemini).
+        ai_client: Initialized AI client (Gemini).
     """
 
     def __init__(

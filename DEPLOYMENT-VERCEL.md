@@ -6,7 +6,7 @@ a resume to Telegram, processes it, replies, and goes back to sleep.
 
 **Why this path:** no credit card needed (sign up with your GitHub account),
 free forever, nothing to keep alive. The trade-off: Vercel cannot run a local
-LLM — this is the Groq-only deployment.
+LLM — this is the Gemini-only deployment.
 
 ---
 
@@ -20,7 +20,7 @@ Telegram webhook ──POST──▶ Vercel function (api/webhook.py)
                                   │
                                   ├── downloads the file from Telegram
                                   ├── runs the exact same Pipeline
-                                  │     (parse → Groq → classifier → validator
+                                   │     (parse → Gemini → classifier → validator
                                   │      → Drive → Sheets)
                                   └── replies to the recruiter via Bot API
 ```
@@ -68,8 +68,7 @@ Add each of these (they apply to all environments):
 | Key | Value |
 |---|---|
 | `BOT_TOKEN` | Your Telegram bot token |
-| `AI_PROVIDER` | `groq` |
-| `GROQ_API_KEY` | Your Groq API key |
+| `GEMINI_API_KEY` | Your Gemini API key |
 | `GOOGLE_DRIVE_CREDENTIALS_JSON` | **The full contents** of `gen-lang-client-….json` (open the file, copy everything, paste here) |
 | `GOOGLE_SHEET_ID` | From your `.env` |
 | `INCOMING_FOLDER_ID` | From your `.env` |
@@ -123,7 +122,7 @@ invocations + errors).
 code** — but a **redeploy is required** for the new value to take effect:
 
 1. **Vercel dashboard → Project → Settings → Environment Variables**.
-2. Edit the value (e.g. new `BOT_TOKEN` from BotFather, new `GROQ_API_KEY`,
+2. Edit the value (e.g. new `BOT_TOKEN` from BotFather, new `GEMINI_API_KEY`,
    new folder IDs, new service-account JSON).
 3. **Deployments → Redeploy** (the latest build). Takes ~1 minute.
 
@@ -161,7 +160,7 @@ polling path (`integrations/telegram/`) was never touched.
 
 - **Vercel Hobby:** $0/month. Function time is well within the free allowance
   (4 CPU-hours/month ≈ hundreds of resumes). Non-commercial personal use only.
-- **Groq:** free tier (rate-limited) — fine for this traffic.
+- **Gemini:** free tier (rate-limited) — fine for this traffic.
 - **Telegram / Google:** free.
 - **No credit card anywhere.**
 

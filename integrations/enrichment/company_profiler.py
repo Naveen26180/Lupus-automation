@@ -85,28 +85,14 @@ def _load_prompt_template() -> str:
 
 
 def _call_ai(prompt: str) -> str:
-    """Call Groq and return the raw text response.
+    """Call Gemini and return the raw text response.
 
-    Uses the same pattern as the main GroqClient — read GROQ_MODEL from env
-    so the model never drifts out of sync.
+    Uses the shared Gemini helper so the model never drifts out of sync
+    with the rest of the project (reads GEMINI_MODEL / GEMINI_API_KEY).
     """
-    import os
-    from groq import Groq
+    from integrations.ai.gemini_client import generate_text
 
-    api_key = os.getenv("GROQ_API_KEY", "")
-    if not api_key:
-        raise ValueError("GROQ_API_KEY not set")
-    # Use the same model as the main GroqClient — read from env so it
-    # never drifts out of sync when the model is updated in .env.
-    model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
-    client = Groq(api_key=api_key)
-    response = client.chat.completions.create(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.1,
-        max_tokens=512,
-    )
-    return response.choices[0].message.content or ""
+    return generate_text(prompt, max_output_tokens=1024, json_mode=True)
 
 
 def _parse_profile_response(raw: str) -> dict:

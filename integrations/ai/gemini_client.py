@@ -1,11 +1,15 @@
-"""Gemini AI client for resume field extraction.
+"""Gemini AI client for resume field extraction and enrichment helpers.
 
 Uses the Google Generative AI SDK with Gemini Flash to extract
 structured data from resume text per the Phase 1 schema.
+
+This is the SOLE AI provider in the project — all resume extraction,
+SaaS classification, and company profiling go through Gemini.
 """
 
 import json
 import logging
+import os
 
 import google.generativeai as genai
 
@@ -14,8 +18,16 @@ from integrations.ai.base_client import BaseAIClient
 
 logger = logging.getLogger(__name__)
 
-# Default model — Gemini 2.0 Flash (free tier)
-_DEFAULT_MODEL = "gemini-2.0-flash"
+# Default model — Gemini 2.5 Flash.
+# Override with the GEMINI_MODEL env var (e.g. "gemini-2.5-pro").
+_DEFAULT_MODEL = "gemini-2.5-flash"
+
+# Shared generation config for resume extraction (Pass 1 / Pass 2).
+_GENERATION_CONFIG = {
+    "temperature": 0,
+    "max_output_tokens": 8192,  # model supports much more; 8192 covers any real resume
+    "response_mime_type": "application/json",
+}
 
 
 class GeminiClient(BaseAIClient):
@@ -23,7 +35,7 @@ class GeminiClient(BaseAIClient):
 
     Args:
         api_key: Google AI (Gemini) API key.
-        model: Model identifier. Defaults to Gemini 2.0 Flash.
+        model: Model identifier. Defaults to Gemini 2.5 Flash.
     """
 
     def __init__(self, api_key: str, model: str = _DEFAULT_MODEL) -> None:
@@ -31,11 +43,7 @@ class GeminiClient(BaseAIClient):
         genai.configure(api_key=api_key)
         self._model = genai.GenerativeModel(
             model_name=model,
-            generation_config={
-                "temperature": 0.0,
-                "max_output_tokens": 8192,  # model supports much more; 8192 covers any real resume
-                "response_mime_type": "application/json",
-            },
+            generation_config=dict(_GENERATION_CONFIG),
         )
         logger.info("GeminiClient initialized with model '%s'", model)
 
@@ -77,3 +85,37 @@ class GeminiClient(BaseAIClient):
             raise AIProviderError(
                 "gemini", f"API call failed: {exc}"
             ) from exc
+
+
+def generate_text(prompt: str, *, max_output_tokens: int = 1024, json_mode: bool = False) -> str:
+    """One-shot Gemini call for enrichment/classification helpers.
+
+    Centralizes the Gemini configuration so every non-resume AI call in the
+    project uses the same provider, model, and temperature.
+
+    Args:
+        prompt: Complete prompt.
+        max_output_tokens: Output token cap (default 1024).
+        json_mode: If True, force ``response_mime_type="application/json"``.
+
+    Returns:
+        Raw text content from the Gemini response.
+
+    Raises:
+        ValueError: If GEMINI_API_KEY is not set.
+        Exception: Propagates API/network errors so callers can fall back.
+    """
+    api_key = os.getenv("GEMINI_API_KEY", "")
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY not set")
+
+    model = os.getenv("GEMINI_MODEL", _DEFAULT_MODEL)
+    genai.configure(api_key=api_key)
+
+    config = {"temperature": 0, "max_output_tokens": max_output_tokens}
+    if json_mode:
+        config["response_mime_type"] = "application/json"
+
+    model_obj = genai.GenerativeModel(model_name=model, generation_config=config)
+    response = model_obj.generate_content(prompt)
+    return response.text or ""

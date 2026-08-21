@@ -29,7 +29,7 @@ The bot runs in two modes:
   (per-field explainability: what rule fired, what evidence, what was rejected)
 - **Forensic audit** — one JSON + one Markdown report per resume under `audit/`,
   referenced from the sheet via the `Audit File` column
-- **SaaS classification** — knowledge-only Groq check of the current company
+- **SaaS classification** — knowledge-only Gemini check of the current company
   (always on, non-fatal)
 - **Company enrichment stack** — domain resolution, company profiling, job
   openings scraper (controlled by `ENRICHMENT_ENABLED`, currently paused)
@@ -113,7 +113,7 @@ resume_bot/
 ├── integrations/
 │   ├── telegram/               # Polling bot + handlers
 │   ├── parsers/                # PDF + DOCX text extraction
-│   ├── ai/                     # Groq + Gemini clients (Pass 1 / Pass 2)
+│   ├── ai/                     # Gemini client (Pass 1 / Pass 2)
 │   ├── drive/                  # Google Drive operations
 │   ├── sheets/                 # Google Sheets operations (3 tabs)
 │   └── enrichment/             # SaaS classifier, profiler, scraper, cache
@@ -137,7 +137,7 @@ resume_bot/
 - Python 3.12+
 - Telegram Bot Token (from [@BotFather](https://t.me/BotFather))
 - Google Cloud service account with Drive + Sheets API enabled
-- Groq API key (free at [console.groq.com](https://console.groq.com)) or Gemini API key
+- Gemini API key (free at [Google AI Studio](https://aistudio.google.com))
 
 ### 2. Install
 
@@ -161,7 +161,7 @@ cp .env.example .env
 
 Key settings:
 
-- `AI_PROVIDER` — `groq` (default) or `gemini`
+- `GEMINI_API_KEY` — your Gemini API key (the sole AI provider)
 - `AI_CLASSIFICATION_ENABLED` — set `true` to enable Pass 2 context
   classification (default `false`, deterministic only)
 - `ENRICHMENT_ENABLED` — company enrichment/scraper toggle (default `true`

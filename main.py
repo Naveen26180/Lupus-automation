@@ -15,7 +15,7 @@ from config.settings import load_settings
 from config.logging_config import setup_logging
 from core.exceptions import ConfigurationError
 from core.pipeline import Pipeline
-from integrations.ai.groq_client import GroqClient
+from integrations.ai.gemini_client import GeminiClient
 from integrations.drive.drive_client import DriveClient
 from integrations.sheets.sheets_client import SheetsClient
 from integrations.telegram.bot import create_bot, run_bot
@@ -30,7 +30,7 @@ def main() -> None:
     Startup sequence:
     1. Load settings from .env
     2. Configure logging
-    3. Initialize AI client (Groq — the sole AI provider)
+    3. Initialize AI client (Gemini — the sole AI provider)
     4. Initialize Google Drive client
     5. Initialize Google Sheets client
     6. Create the processing pipeline
@@ -48,13 +48,13 @@ def main() -> None:
     setup_logging(settings.LOG_LEVEL)
     logger.info("=" * 60)
     logger.info("Resume Processing Bot starting up")
-    logger.info("AI Provider: %s", settings.AI_PROVIDER)
+    logger.info("AI Provider: gemini")
     logger.info("=" * 60)
 
-    # --- 3. Initialize AI client (Groq is the sole provider) ---
-    ai_client = GroqClient(api_key=settings.GROQ_API_KEY)
+    # --- 3. Initialize AI client (Gemini is the sole provider) ---
+    ai_client = GeminiClient(api_key=settings.GEMINI_API_KEY)
 
-    logger.info("AI client initialized: %s", settings.AI_PROVIDER)
+    logger.info("AI client initialized: gemini")
 
     # --- 4. Initialize Google Drive client ---
     drive_client = DriveClient(

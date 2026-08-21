@@ -1,6 +1,6 @@
 """Knowledge-only SaaS classifier for a candidate's current company.
 
-Asks Groq directly using its own general knowledge — no scraping, no domain
+Asks Gemini directly using its own general knowledge — no scraping, no domain
 lookup, no website fetch.  Fast enough to run synchronously inside the same
 pipeline that produces the Telegram reply with no noticeable delay added.
 
@@ -30,7 +30,6 @@ spot-checked after the fact against the raw model response.
 
 import json
 import logging
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -72,21 +71,10 @@ def _build_prompt(company_name: str) -> str:
 
 
 def _call_ai(prompt: str) -> str:
-    """Call Groq and return the raw text response.  Raises on failure."""
-    from groq import Groq  # local import — keeps module import fast
+    """Call Gemini and return the raw text response.  Raises on failure."""
+    from integrations.ai.gemini_client import generate_text
 
-    api_key = os.getenv("GROQ_API_KEY", "")
-    if not api_key:
-        raise ValueError("GROQ_API_KEY not set")
-    model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
-    client = Groq(api_key=api_key)
-    response = client.chat.completions.create(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.0,   # deterministic
-        max_tokens=10,     # we only need one word
-    )
-    return (response.choices[0].message.content or "").strip()
+    return generate_text(prompt, max_output_tokens=10, json_mode=False).strip()
 
 
 def _parse_response(raw: str) -> str:

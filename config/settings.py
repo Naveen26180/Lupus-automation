@@ -28,11 +28,8 @@ class Settings:
     # Telegram
     BOT_TOKEN: str
 
-    # AI
-    AI_PROVIDER: str          # "groq", "gemini", or "cerebras"
-    GROQ_API_KEY: str
+    # AI (Gemini is the sole provider)
     GEMINI_API_KEY: str
-    CEREBRAS_API_KEY: str
 
     # Google
     GOOGLE_DRIVE_CREDENTIALS: str   # path to service account JSON
@@ -56,16 +53,9 @@ def load_settings() -> Settings:
         A frozen Settings dataclass with all config values.
 
     Raises:
-        ConfigurationError: If a required variable is missing or
-            AI_PROVIDER has an invalid value.
+        ConfigurationError: If a required variable is missing.
     """
     load_dotenv(_ENV_PATH, encoding="utf-8-sig")
-
-    ai_provider = os.getenv("AI_PROVIDER", "groq").lower().strip()
-    if ai_provider not in ("groq", "gemini", "cerebras"):
-        raise ConfigurationError(
-            f"AI_PROVIDER must be 'groq', 'gemini', or 'cerebras', got '{ai_provider}'"
-        )
 
     # --- Required keys (always needed) ---
     required_keys = [
@@ -84,18 +74,10 @@ def load_settings() -> Settings:
             f"Missing required environment variables: {', '.join(missing)}"
         )
 
-    # --- Provider-specific key ---
-    if ai_provider == "groq" and not os.getenv("GROQ_API_KEY"):
+    # --- Gemini key (sole AI provider) ---
+    if not os.getenv("GEMINI_API_KEY"):
         raise ConfigurationError(
-            "AI_PROVIDER is 'groq' but GROQ_API_KEY is not set"
-        )
-    if ai_provider == "gemini" and not os.getenv("GEMINI_API_KEY"):
-        raise ConfigurationError(
-            "AI_PROVIDER is 'gemini' but GEMINI_API_KEY is not set"
-        )
-    if ai_provider == "cerebras" and not os.getenv("CEREBRAS_API_KEY"):
-        raise ConfigurationError(
-            "AI_PROVIDER is 'cerebras' but CEREBRAS_API_KEY is not set"
+            "GEMINI_API_KEY is not set — required for the Gemini AI provider"
         )
 
     # Resolve GOOGLE_DRIVE_CREDENTIALS to an absolute path.
@@ -119,10 +101,7 @@ def load_settings() -> Settings:
 
     return Settings(
         BOT_TOKEN=os.getenv("BOT_TOKEN", ""),
-        AI_PROVIDER=ai_provider,
-        GROQ_API_KEY=os.getenv("GROQ_API_KEY", ""),
         GEMINI_API_KEY=os.getenv("GEMINI_API_KEY", ""),
-        CEREBRAS_API_KEY=os.getenv("CEREBRAS_API_KEY", ""),
         GOOGLE_DRIVE_CREDENTIALS=creds_path,
         GOOGLE_SHEET_ID=os.getenv("GOOGLE_SHEET_ID", ""),
         INCOMING_FOLDER_ID=os.getenv("INCOMING_FOLDER_ID", ""),

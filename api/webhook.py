@@ -30,7 +30,7 @@ from mangum import Mangum
 
 from config.settings import load_settings
 from core.pipeline import Pipeline, RecruiterMetadata
-from integrations.ai.groq_client import GroqClient
+from integrations.ai.gemini_client import GeminiClient
 from integrations.drive.drive_client import DriveClient
 from integrations.sheets.sheets_client import SheetsClient
 
@@ -107,7 +107,7 @@ def build_pipeline() -> Pipeline:
     _ensure_credentials_file()
     settings = load_settings()
 
-    ai_client = GroqClient(api_key=settings.GROQ_API_KEY)
+    ai_client = GeminiClient(api_key=settings.GEMINI_API_KEY)
 
     drive_client = DriveClient(
         credentials_path=settings.GOOGLE_DRIVE_CREDENTIALS,

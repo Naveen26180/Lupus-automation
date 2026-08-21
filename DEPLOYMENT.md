@@ -35,7 +35,7 @@ same server can host both the bot and your future local model.
 Your laptop ──(SSH)──> Oracle VPS (always on)
                           │
                           ├── runs main.py as a systemd service (auto-restart)
-                          ├── reads .env (Telegram token, Groq key, Google IDs)
+                          ├── reads .env (Telegram token, Gemini key, Google IDs)
                           ├── uses the service-account JSON for Drive/Sheets
                           └── polls Telegram for messages (outbound only)
 ```
@@ -45,7 +45,7 @@ Your laptop ──(SSH)──> Oracle VPS (always on)
   crashes, systemd restarts it. It also starts the bot automatically when the
   server boots.
 - **The bot needs no open ports and no website** — it only makes outgoing
-  connections (to Telegram, Groq, Google). Nothing to configure on a firewall.
+  connections (to Telegram, Gemini, Google). Nothing to configure on a firewall.
 
 ---
 
@@ -55,7 +55,7 @@ Your laptop ──(SSH)──> Oracle VPS (always on)
 |---|---|---|
 | GitHub account with the `Lupus-automation` repo (private) | Done — already pushed | ✅ |
 | Telegram bot token (`BOT_TOKEN`) | BotFather on Telegram | Get if missing |
-| Groq API key (`GROQ_API_KEY`) | console.groq.com → API Keys | Get if missing |
+| Gemini API key (`GEMINI_API_KEY`) | Google AI Studio → API Keys | Get if missing |
 | Google service-account JSON | `gen-lang-client-0805362925-6909de6a53cf.json` on your laptop | ✅ |
 | Google Sheet ID + 4 Drive folder IDs | From the sheet/folder URLs (your `.env` has them) | ✅ |
 | A credit/debit card | For Oracle's free signup — **never charged** (see below) | — |
@@ -213,8 +213,7 @@ Set these (copy from your laptop's `.env`):
 
 ```
 BOT_TOKEN=<your Telegram token>
-AI_PROVIDER=groq
-GROQ_API_KEY=<your Groq key>
+GEMINI_API_KEY=<your Gemini key>
 AI_CLASSIFICATION_ENABLED=false        # flip to true when you want Pass 2
 GOOGLE_DRIVE_CREDENTIALS=gen-lang-client-0805362925-6909de6a53cf.json
 GOOGLE_SHEET_ID=<your sheet ID>
@@ -297,7 +296,7 @@ sudo git pull
 sudo systemctl restart lupus-bot
 ```
 
-Changing a credential (Telegram token, Groq key, Google folder IDs) = edit
+Changing a credential (Telegram token, Gemini key, Google folder IDs) = edit
 `.env`, then `sudo systemctl restart lupus-bot`. **No code change, no redeploy.**
 
 ---
@@ -340,7 +339,7 @@ completely idle for a long time; your always-running bot prevents that).
 - [ ] Deploy key added to GitHub, repo cloned at `/opt/Lupus-automation`
 - [ ] `bash deploy/setup.sh` completed without errors
 - [ ] Service-account JSON uploaded next to `.env`
-- [ ] `.env` filled (token, Groq key, IDs, `LOG_LEVEL=INFO`, relative creds path)
+- [ ] `.env` filled (token, Gemini key, IDs, `LOG_LEVEL=INFO`, relative creds path)
 - [ ] Service-account email shared as Editor on the Sheet + 4 folders
 - [ ] Foreground test run works (`venv/bin/python main.py`)
 - [ ] **Local bot stopped**

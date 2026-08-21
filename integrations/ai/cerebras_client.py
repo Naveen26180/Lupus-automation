@@ -22,10 +22,10 @@ from integrations.ai.base_client import BaseAIClient
 
 logger = logging.getLogger(__name__)
 
-# Best model for structured JSON extraction on Cerebras free tier.
-# Official Cerebras model ID is "llama-3.3-70b" (hyphens, NOT dots — the
-# dotted "llama3.3-70b" returns a 404 model_not_found error).
-_DEFAULT_MODEL = "llama-3.3-70b"
+# Default model for structured JSON extraction. "llama3.1-8b" is the model
+# available on the free tier / standard accounts (the 70B model may return
+# 404 "does not exist or you do not have access"). Override via CEREBRAS_MODEL.
+_DEFAULT_MODEL = "llama3.1-8b"
 
 # Token-limit error fragments (same detection logic as GroqClient).
 _TOKEN_LIMIT_FRAGMENTS = frozenset([

@@ -18,9 +18,10 @@ from integrations.ai.base_client import BaseAIClient
 
 logger = logging.getLogger(__name__)
 
-# Default model — Gemini 2.5 Flash.
-# Override with the GEMINI_MODEL env var (e.g. "gemini-2.5-pro").
-_DEFAULT_MODEL = "gemini-2.5-flash"
+# Default model — Gemini Flash.
+# gemini-2.5-flash is no longer available to new API keys; Google directs
+# new users to gemini-3.6-flash. Override with the GEMINI_MODEL env var.
+_DEFAULT_MODEL = "gemini-3.6-flash"
 
 # Shared generation config for resume extraction (Pass 1 / Pass 2).
 _GENERATION_CONFIG = {

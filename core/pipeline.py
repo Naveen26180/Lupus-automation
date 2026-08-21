@@ -85,7 +85,7 @@ class Pipeline:
         settings: Application settings.
         drive_client: Initialized DriveClient.
         sheets_client: Initialized SheetsClient.
-        ai_client: Initialized AI client (Groq or Gemini).
+        ai_client: Initialized AI client (Groq, Cerebras, or Gemini).
     """
 
     def __init__(
@@ -217,8 +217,9 @@ class Pipeline:
         }
 
         # --- Stage 5b: SaaS Classification (knowledge-only, always on) ---
-        # Independent of the scraper enrichment flag. Asks Groq directly using
-        # its general knowledge — no web requests, no domain lookup.
+        # Independent of the scraper enrichment flag. Asks the active AI
+        # provider directly using its general knowledge — no web requests,
+        # no domain lookup.
         # Returns 'Yes', 'No', or '' (blank = genuinely uncertain).
         # Never raises; any failure silently returns blank.
         try:

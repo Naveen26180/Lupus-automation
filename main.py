@@ -16,6 +16,7 @@ from config.logging_config import setup_logging
 from core.exceptions import ConfigurationError
 from core.pipeline import Pipeline
 from integrations.ai.groq_client import GroqClient
+from integrations.ai.cerebras_client import CerebrasClient
 from integrations.ai.gemini_client import GeminiClient
 from integrations.drive.drive_client import DriveClient
 from integrations.sheets.sheets_client import SheetsClient
@@ -31,7 +32,7 @@ def main() -> None:
     Startup sequence:
     1. Load settings from .env
     2. Configure logging
-    3. Initialize AI client (Groq or Gemini based on AI_PROVIDER)
+    3. Initialize AI client (Groq, Cerebras, or Gemini based on AI_PROVIDER)
     4. Initialize Google Drive client
     5. Initialize Google Sheets client
     6. Create the processing pipeline
@@ -55,6 +56,8 @@ def main() -> None:
     # --- 3. Initialize AI client ---
     if settings.AI_PROVIDER == "groq":
         ai_client = GroqClient(api_key=settings.GROQ_API_KEY)
+    elif settings.AI_PROVIDER == "cerebras":
+        ai_client = CerebrasClient(api_key=settings.CEREBRAS_API_KEY)
     elif settings.AI_PROVIDER == "gemini":
         ai_client = GeminiClient(api_key=settings.GEMINI_API_KEY)
     else:

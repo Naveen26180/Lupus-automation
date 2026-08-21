@@ -22,11 +22,19 @@ from integrations.ai.base_client import BaseAIClient
 
 logger = logging.getLogger(__name__)
 
-# Default model — Llama 3.3 70B Versatile.
-# Non-reasoning instruction-tuned model with native JSON mode support.
-# Free tier, 128k context, 32k max output. Best balance of accuracy and speed
-# for structured JSON extraction tasks on the Groq platform.
+# Default model — Llama 3.3 70B Versatile (non-reasoning, native JSON mode).
+# Free tier, 128k context, 32k max output.
 _DEFAULT_MODEL = "llama-3.3-70b-versatile"
+
+# Fallback chain — tried in order if a model returns 404 (not on this account).
+# openai/gpt-oss-20b is a reasoning model and needs different API params.
+_REASONING_MODELS = frozenset(["openai/gpt-oss-20b", "openai/gpt-oss-120b"])
+
+_MODEL_FALLBACK_CHAIN = [
+    "llama-3.3-70b-versatile",           # best: non-reasoning, native JSON mode
+    "openai/gpt-oss-20b",                # fallback: reasoning model (confirmed available)
+    "meta-llama/llama-4-scout-17b-16e-instruct",  # fallback: Llama 4 Scout
+]
 
 # Groq status codes / message fragments that indicate a permanent token-budget error.
 # These must NOT be retried — the same prompt will fail again.

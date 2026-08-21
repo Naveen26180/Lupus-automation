@@ -60,13 +60,15 @@ def setup_logging(log_level: str = "INFO") -> None:
     root_logger.addHandler(file_handler)
 
     # Quiet noisy third-party loggers.
-    # CRITICAL: the Groq/OpenAI SDKs log the FULL request payload — including
-    # the resume text with candidate names, emails and phones — at DEBUG level.
-    # Because the file handler logs at DEBUG, those payloads would otherwise
-    # be written to app.log on every resume. Silencing the SDK loggers is what
-    # keeps candidate PII out of the logs; do not remove these lines.
+    # CRITICAL: the Groq/OpenAI/Cerebras SDKs log the FULL request payload —
+    # including the resume text with candidate names, emails and phones — at
+    # DEBUG level. Because the file handler logs at DEBUG, those payloads would
+    # otherwise be written to app.log on every resume. Silencing the SDK
+    # loggers is what keeps candidate PII out of the logs; do not remove these
+    # lines.
     _QUIET_LOGGERS = (
         "groq",          # full API payloads (resume text + PII) at DEBUG
+        "cerebras",      # same OpenAI-compatible SDK family
         "openai",        # same SDK family as groq
         "httpx",
         "httpcore",

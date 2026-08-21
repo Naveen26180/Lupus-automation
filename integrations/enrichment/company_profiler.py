@@ -114,6 +114,21 @@ def _call_ai(prompt: str) -> str:
         )
         return response.choices[0].message.content or ""
 
+    elif provider == "cerebras":
+        from cerebras.cloud.sdk import Cerebras
+        api_key = os.getenv("CEREBRAS_API_KEY", "")
+        if not api_key:
+            raise ValueError("CEREBRAS_API_KEY not set")
+        model = os.getenv("CEREBRAS_MODEL", "llama3.3-70b")
+        client = Cerebras(api_key=api_key)
+        response = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1,
+            max_tokens=512,
+        )
+        return response.choices[0].message.content or ""
+
     elif provider == "gemini":
         import google.generativeai as genai
         api_key = os.getenv("GEMINI_API_KEY", "")

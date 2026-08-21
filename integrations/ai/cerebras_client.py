@@ -114,8 +114,9 @@ class CerebrasClient(BaseAIClient):
                 "cerebras", f"Connection error: {exc}"
             ) from exc
         except APIError as exc:
+            status = getattr(exc, "status_code", "unknown")
             raise AIProviderError(
-                "cerebras", f"API error (status {exc.status_code}): {exc}"
+                "cerebras", f"API error (status {status}): {exc}"
             ) from exc
         except AIProviderError:
             raise

@@ -1,7 +1,8 @@
 """Abstract base class for AI provider clients.
 
-Defines the contract that both groq_client.py and gemini_client.py
-implement, so pipeline.py never needs to know which provider is active.
+Defines the contract that groq_client.py, cerebras_client.py and
+gemini_client.py implement, so pipeline.py never needs to know which
+provider is active.
 
 Extraction + context-classification architecture
 --------------------------------------------------

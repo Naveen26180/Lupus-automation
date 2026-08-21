@@ -33,7 +33,7 @@ class GeminiClient(BaseAIClient):
             model_name=model,
             generation_config={
                 "temperature": 0.0,
-                "max_output_tokens": 2048,
+                "max_output_tokens": 8192,  # model supports much more; 8192 covers any real resume
                 "response_mime_type": "application/json",
             },
         )

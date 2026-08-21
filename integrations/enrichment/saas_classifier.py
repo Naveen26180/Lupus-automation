@@ -79,16 +79,15 @@ def _call_groq(prompt: str) -> str:
     if not api_key:
         raise ValueError("GROQ_API_KEY not set")
 
-    model = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
+    model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
     client = Groq(api_key=api_key)
     response = client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.0,   # deterministic
         max_tokens=10,     # we only need one word
-        # Suppress reasoning tokens — without this, gpt-oss-20b injects
-        # <think>…</think> into the content which breaks the one-word parse.
-        reasoning_format="hidden",
+        # No reasoning_format needed — llama-3.3-70b-versatile is not a reasoning model.
+        # It returns clean single-word answers without any <think> token injection.
     )
     return (response.choices[0].message.content or "").strip()
 

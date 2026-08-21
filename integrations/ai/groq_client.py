@@ -1,13 +1,15 @@
 """Groq AI client for resume field extraction.
 
-Uses the Groq SDK with openai/gpt-oss-20b to extract structured data
-from resume text per the two-pass Phase 1 schema.
+Uses the Groq SDK with llama-3.3-70b-versatile to extract structured
+data from resume text per the two-pass Phase 1 schema.
 
-NOTE: response_format={"type":"json_object"} is intentionally NOT used.
-The openai/gpt-oss-20b reasoning model returns 400 json_validate_failed
-when that parameter is set, even with reasoning_format="hidden". Instead
-we ask the model to return JSON in the system prompt and extract the JSON
-block from the free-text response ourselves.
+Model choice rationale
+----------------------
+llama-3.3-70b-versatile is a standard instruction-tuned model (NOT a
+reasoning model) that fully supports response_format={"type":"json_object"}.
+We previously used openai/gpt-oss-20b but that is a reasoning model whose
+<think> token injection and incompatibility with JSON mode caused persistent
+400 json_validate_failed errors even with reasoning_format="hidden".
 """
 
 import logging
@@ -20,9 +22,11 @@ from integrations.ai.base_client import BaseAIClient
 
 logger = logging.getLogger(__name__)
 
-# Default model — GPT-OSS 20B (Groq's recommended replacement for the
-# retired llama-3.1-8b-instant; works on the free tier)
-_DEFAULT_MODEL = "openai/gpt-oss-20b"
+# Default model — Llama 3.3 70B Versatile.
+# Non-reasoning instruction-tuned model with native JSON mode support.
+# Free tier, 128k context, 32k max output. Best balance of accuracy and speed
+# for structured JSON extraction tasks on the Groq platform.
+_DEFAULT_MODEL = "llama-3.3-70b-versatile"
 
 # Groq status codes / message fragments that indicate a permanent token-budget error.
 # These must NOT be retried — the same prompt will fail again.
@@ -102,20 +106,17 @@ class GroqClient(BaseAIClient):
                     },
                     {"role": "user", "content": prompt},
                 ],
-                temperature=0.0,  # deterministic extraction
-                max_tokens=8192,  # model supports 32,768 output tokens; 8192 fits any real resume
-                # reasoning_format="hidden" suppresses <think> tokens so
-                # they don't appear in the content and break JSON parsing.
-                # response_format is intentionally omitted — it triggers
-                # 400 json_validate_failed on this reasoning model.
-                reasoning_format="hidden",
+                temperature=0.0,          # deterministic extraction
+                max_tokens=8192,          # 128k context / 32k output; 8192 covers any real resume
+                response_format={"type": "json_object"},  # enforced — works on non-reasoning models
             )
 
             content = response.choices[0].message.content
             if not content:
                 raise AIProviderError("groq", "Empty response from model")
 
-            # Extract the JSON block in case the model added any wrapper text
+            # _extract_json is a safety net in case the model adds wrapper text
+            # despite JSON mode — rare but possible on older SDK versions.
             content = self._extract_json(content)
             logger.debug("Groq raw response length: %d chars", len(content))
             return content

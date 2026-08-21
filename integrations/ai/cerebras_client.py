@@ -22,10 +22,11 @@ from integrations.ai.base_client import BaseAIClient
 
 logger = logging.getLogger(__name__)
 
-# Default model for structured JSON extraction. "llama3.1-8b" is the model
-# available on the Cerebras free tier (gemma-4-31b and llama-3.3-70b return
-# 402/404 on free accounts). Override via CEREBRAS_MODEL if you add billing.
-_DEFAULT_MODEL = "llama3.1-8b"
+# Default model for structured JSON extraction. Current Cerebras model ID is
+# "llama-3.1-8b" (hyphenated — the older dotted "llama3.1-8b" now 404s).
+# NOTE: Cerebras ended the no-card free tier ~Aug 17 2026, so a payment method
+# may be required; override via CEREBRAS_MODEL if you have billing for others.
+_DEFAULT_MODEL = "llama-3.1-8b"
 
 # Token-limit error fragments (same detection logic as GroqClient).
 _TOKEN_LIMIT_FRAGMENTS = frozenset([

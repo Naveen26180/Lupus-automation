@@ -103,7 +103,7 @@ class GroqClient(BaseAIClient):
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.0,  # deterministic extraction
-                max_tokens=4096,
+                max_tokens=8192,  # model supports 32,768 output tokens; 8192 fits any real resume
                 # reasoning_format="hidden" suppresses <think> tokens so
                 # they don't appear in the content and break JSON parsing.
                 # response_format is intentionally omitted — it triggers

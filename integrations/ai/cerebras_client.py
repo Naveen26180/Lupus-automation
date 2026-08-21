@@ -22,10 +22,10 @@ from integrations.ai.base_client import BaseAIClient
 
 logger = logging.getLogger(__name__)
 
-# Default model for structured JSON extraction. "gemma-4-31b" is a
-# non-reasoning model with reliable JSON mode, available on the public/free
-# tier. Override via CEREBRAS_MODEL (e.g. gpt-oss-120b for higher quality).
-_DEFAULT_MODEL = "gemma-4-31b"
+# Default model for structured JSON extraction. "llama3.1-8b" is the model
+# available on the Cerebras free tier (gemma-4-31b and llama-3.3-70b return
+# 402/404 on free accounts). Override via CEREBRAS_MODEL if you add billing.
+_DEFAULT_MODEL = "llama3.1-8b"
 
 # Token-limit error fragments (same detection logic as GroqClient).
 _TOKEN_LIMIT_FRAGMENTS = frozenset([

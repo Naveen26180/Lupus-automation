@@ -85,61 +85,28 @@ def _load_prompt_template() -> str:
 
 
 def _call_ai(prompt: str) -> str:
-    """Call the active AI provider using the same pattern as base_client.py.
+    """Call Groq and return the raw text response.
 
-    We call the AI directly here rather than reusing extract_fields()
-    because this is a different, smaller prompt — not a resume extraction.
-    We share the same underlying Groq/Gemini client initialisation pattern.
-
-    Returns raw text response.
+    Uses the same pattern as the main GroqClient — read GROQ_MODEL from env
+    so the model never drifts out of sync.
     """
     import os
+    from groq import Groq
 
-    provider = os.getenv("AI_PROVIDER", "groq").lower().strip()
-
-    if provider == "groq":
-        from groq import Groq
-        api_key = os.getenv("GROQ_API_KEY", "")
-        if not api_key:
-            raise ValueError("GROQ_API_KEY not set")
-        # Use the same model as the main GroqClient — read from env so it
-        # never drifts out of sync when the model is updated in .env.
-        model = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
-        client = Groq(api_key=api_key)
-        response = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.1,
-            max_tokens=512,
-        )
-        return response.choices[0].message.content or ""
-
-    elif provider == "cerebras":
-        from cerebras.cloud.sdk import Cerebras
-        api_key = os.getenv("CEREBRAS_API_KEY", "")
-        if not api_key:
-            raise ValueError("CEREBRAS_API_KEY not set")
-        model = os.getenv("CEREBRAS_MODEL", "llama-3.1-8b")
-        client = Cerebras(api_key=api_key)
-        response = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.1,
-            max_tokens=512,
-        )
-        return response.choices[0].message.content or ""
-
-    elif provider == "gemini":
-        import google.generativeai as genai
-        api_key = os.getenv("GEMINI_API_KEY", "")
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY not set")
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(prompt)
-        return response.text or ""
-
-    raise ValueError(f"Unknown AI_PROVIDER: '{provider}'")
+    api_key = os.getenv("GROQ_API_KEY", "")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not set")
+    # Use the same model as the main GroqClient — read from env so it
+    # never drifts out of sync when the model is updated in .env.
+    model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+    client = Groq(api_key=api_key)
+    response = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.1,
+        max_tokens=512,
+    )
+    return response.choices[0].message.content or ""
 
 
 def _parse_profile_response(raw: str) -> dict:

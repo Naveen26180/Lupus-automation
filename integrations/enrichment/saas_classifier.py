@@ -72,57 +72,21 @@ def _build_prompt(company_name: str) -> str:
 
 
 def _call_ai(prompt: str) -> str:
-    """Call the active AI provider and return the raw text response.
+    """Call Groq and return the raw text response.  Raises on failure."""
+    from groq import Groq  # local import — keeps module import fast
 
-    Dispatches on AI_PROVIDER (groq / cerebras / gemini).  Raises on failure
-    or if the provider is unknown / its API key is missing.
-    """
-    provider = os.getenv("AI_PROVIDER", "groq").lower().strip()
-
-    if provider == "groq":
-        from groq import Groq  # local import — keeps module import fast
-
-        api_key = os.getenv("GROQ_API_KEY", "")
-        if not api_key:
-            raise ValueError("GROQ_API_KEY not set")
-        model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
-        client = Groq(api_key=api_key)
-        response = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.0,   # deterministic
-            max_tokens=10,     # we only need one word
-        )
-        return (response.choices[0].message.content or "").strip()
-
-    if provider == "cerebras":
-        from cerebras.cloud.sdk import Cerebras
-
-        api_key = os.getenv("CEREBRAS_API_KEY", "")
-        if not api_key:
-            raise ValueError("CEREBRAS_API_KEY not set")
-        model = os.getenv("CEREBRAS_MODEL", "llama-3.1-8b")
-        client = Cerebras(api_key=api_key)
-        response = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.0,   # deterministic
-            max_tokens=10,     # we only need one word
-        )
-        return (response.choices[0].message.content or "").strip()
-
-    if provider == "gemini":
-        import google.generativeai as genai
-
-        api_key = os.getenv("GEMINI_API_KEY", "")
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY not set")
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-2.0-flash")
-        response = model.generate_content(prompt)
-        return (response.text or "").strip()
-
-    raise ValueError(f"Unknown AI_PROVIDER: '{provider}'")
+    api_key = os.getenv("GROQ_API_KEY", "")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not set")
+    model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+    client = Groq(api_key=api_key)
+    response = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.0,   # deterministic
+        max_tokens=10,     # we only need one word
+    )
+    return (response.choices[0].message.content or "").strip()
 
 
 def _parse_response(raw: str) -> str:

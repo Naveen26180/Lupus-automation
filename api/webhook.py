@@ -30,7 +30,6 @@ from mangum import Mangum
 
 from config.settings import load_settings
 from core.pipeline import Pipeline, RecruiterMetadata
-from integrations.ai.cerebras_client import CerebrasClient
 from integrations.ai.gemini_client import GeminiClient
 from integrations.ai.groq_client import GroqClient
 from integrations.drive.drive_client import DriveClient

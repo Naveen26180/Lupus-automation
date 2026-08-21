@@ -22,9 +22,9 @@ from integrations.ai.base_client import BaseAIClient
 
 logger = logging.getLogger(__name__)
 
-# Default model — Llama 3.3 70B Versatile (non-reasoning, native JSON mode).
-# Free tier, 128k context, 32k max output.
-_DEFAULT_MODEL = "llama-3.3-70b-versatile"
+# Default model — OpenAI GPT OSS 120B (reasoning model).
+# Free tier available; supports response_format JSON mode with safety net.
+_DEFAULT_MODEL = "openai/gpt-oss-120b"
 
 # Fallback chain — tried in order if a model returns 404 (not on this account).
 # openai/gpt-oss-20b is a reasoning model and needs different API params.

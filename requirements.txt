@@ -11,6 +11,7 @@ python-docx==1.1.2
 # AI providers
 groq==0.28.0
 google-generativeai==0.8.5
+cerebras-cloud-sdk
 
 # Serverless webhook (Vercel deployment)
 fastapi==0.115.6

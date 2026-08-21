@@ -29,9 +29,10 @@ class Settings:
     BOT_TOKEN: str
 
     # AI
-    AI_PROVIDER: str          # "groq" or "gemini"
+    AI_PROVIDER: str          # "groq", "gemini", or "cerebras"
     GROQ_API_KEY: str
     GEMINI_API_KEY: str
+    CEREBRAS_API_KEY: str
 
     # Google
     GOOGLE_DRIVE_CREDENTIALS: str   # path to service account JSON
@@ -61,9 +62,9 @@ def load_settings() -> Settings:
     load_dotenv(_ENV_PATH, encoding="utf-8-sig")
 
     ai_provider = os.getenv("AI_PROVIDER", "groq").lower().strip()
-    if ai_provider not in ("groq", "gemini"):
+    if ai_provider not in ("groq", "gemini", "cerebras"):
         raise ConfigurationError(
-            f"AI_PROVIDER must be 'groq' or 'gemini', got '{ai_provider}'"
+            f"AI_PROVIDER must be 'groq', 'gemini', or 'cerebras', got '{ai_provider}'"
         )
 
     # --- Required keys (always needed) ---
@@ -92,6 +93,10 @@ def load_settings() -> Settings:
         raise ConfigurationError(
             "AI_PROVIDER is 'gemini' but GEMINI_API_KEY is not set"
         )
+    if ai_provider == "cerebras" and not os.getenv("CEREBRAS_API_KEY"):
+        raise ConfigurationError(
+            "AI_PROVIDER is 'cerebras' but CEREBRAS_API_KEY is not set"
+        )
 
     # Resolve GOOGLE_DRIVE_CREDENTIALS to an absolute path.
     # Accepts either an absolute path (local Windows setup) or a path
@@ -117,6 +122,7 @@ def load_settings() -> Settings:
         AI_PROVIDER=ai_provider,
         GROQ_API_KEY=os.getenv("GROQ_API_KEY", ""),
         GEMINI_API_KEY=os.getenv("GEMINI_API_KEY", ""),
+        CEREBRAS_API_KEY=os.getenv("CEREBRAS_API_KEY", ""),
         GOOGLE_DRIVE_CREDENTIALS=creds_path,
         GOOGLE_SHEET_ID=os.getenv("GOOGLE_SHEET_ID", ""),
         INCOMING_FOLDER_ID=os.getenv("INCOMING_FOLDER_ID", ""),

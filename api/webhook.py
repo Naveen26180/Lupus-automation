@@ -30,6 +30,7 @@ from mangum import Mangum
 
 from config.settings import load_settings
 from core.pipeline import Pipeline, RecruiterMetadata
+from integrations.ai.cerebras_client import CerebrasClient
 from integrations.ai.gemini_client import GeminiClient
 from integrations.ai.groq_client import GroqClient
 from integrations.drive.drive_client import DriveClient
@@ -110,6 +111,8 @@ def build_pipeline() -> Pipeline:
 
     if settings.AI_PROVIDER == "groq":
         ai_client = GroqClient(api_key=settings.GROQ_API_KEY)
+    elif settings.AI_PROVIDER == "cerebras":
+        ai_client = CerebrasClient(api_key=settings.CEREBRAS_API_KEY)
     else:
         ai_client = GeminiClient(api_key=settings.GEMINI_API_KEY)
 

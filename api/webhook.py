@@ -107,8 +107,7 @@ def build_pipeline() -> Pipeline:
     _ensure_credentials_file()
     settings = load_settings()
 
-    if settings.AI_PROVIDER == "groq":
-        ai_client = GroqClient(api_key=settings.GROQ_API_KEY)
+    ai_client = GroqClient(api_key=settings.GROQ_API_KEY)
 
     drive_client = DriveClient(
         credentials_path=settings.GOOGLE_DRIVE_CREDENTIALS,

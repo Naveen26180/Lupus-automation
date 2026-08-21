@@ -12,6 +12,7 @@ Why Cerebras?
 """
 
 import logging
+import os
 import re
 
 from cerebras.cloud.sdk import Cerebras, APIError, RateLimitError, APIConnectionError
@@ -22,8 +23,9 @@ from integrations.ai.base_client import BaseAIClient
 logger = logging.getLogger(__name__)
 
 # Best model for structured JSON extraction on Cerebras free tier.
-# llama3.3-70b = Llama 3.3 70B — note: Cerebras uses dots in the version number.
-_DEFAULT_MODEL = "llama3.3-70b"
+# Official Cerebras model ID is "llama-3.3-70b" (hyphens, NOT dots — the
+# dotted "llama3.3-70b" returns a 404 model_not_found error).
+_DEFAULT_MODEL = "llama-3.3-70b"
 
 # Token-limit error fragments (same detection logic as GroqClient).
 _TOKEN_LIMIT_FRAGMENTS = frozenset([
@@ -45,11 +47,12 @@ class CerebrasClient(BaseAIClient):
         model: Model identifier. Defaults to llama3.3-70b.
     """
 
-    def __init__(self, api_key: str, model: str = _DEFAULT_MODEL) -> None:
+    def __init__(self, api_key: str, model: str | None = None) -> None:
         super().__init__(api_key=api_key, provider_name="cerebras")
         self._client = Cerebras(api_key=api_key)
-        self._model = model
-        logger.info("CerebrasClient initialized with model '%s'", model)
+        # Allow overriding the model via CEREBRAS_MODEL (e.g. "llama3.1-8b").
+        self._model = model or os.getenv("CEREBRAS_MODEL", _DEFAULT_MODEL)
+        logger.info("CerebrasClient initialized with model '%s'", self._model)
 
     @staticmethod
     def _extract_json(text: str) -> str:

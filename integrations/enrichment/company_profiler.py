@@ -119,7 +119,7 @@ def _call_ai(prompt: str) -> str:
         api_key = os.getenv("CEREBRAS_API_KEY", "")
         if not api_key:
             raise ValueError("CEREBRAS_API_KEY not set")
-        model = os.getenv("CEREBRAS_MODEL", "llama3.3-70b")
+        model = os.getenv("CEREBRAS_MODEL", "llama-3.3-70b")
         client = Cerebras(api_key=api_key)
         response = client.chat.completions.create(
             model=model,
